@@ -1,9 +1,12 @@
 {
-    "name": "open-southeners/packagist_package_here",
-    "description": "and_description_here",
+    "name": "open-southeners/docker-php",
+    "description": "An unofficial SDK for Docker API written in PHP",
     "license": "MIT",
     "keywords": [
-        "open-southeners"
+        "open-southeners",
+        "docker",
+        "client",
+        "api"
     ],
     "authors": [
         {
@@ -19,33 +22,39 @@
         }
     ],
     "require": {
-        "php": "^8.0 || ^8.1 || ^8.2"
+        "php": "^8.0",
+        "ext-json": "*",
+        "open-southeners/laravel-helpers": "~0.13",
+        "php-http/client-common": "^2.0",
+        "php-http/discovery": "^1.0",
+        "php-http/httplug": "^2.0",
+        "php-http/message": "^1.0",
+        "psr/http-factory": "^1.0",
+        "php-http/socket-client": "^2.0",
+        "psr/http-client-implementation": "^1.0",
+        "psr/http-message": "^1.0"
     },
     "require-dev": {
-        "nunomaduro/larastan": "^2.0",
-        "orchestra/testbench": "^7.0 || ^8.0",
+        "laravel/pint": "^1.13",
+        "guzzlehttp/guzzle": "^7.1",
         "phpstan/phpstan": "^1.0",
-        "phpunit/phpunit": "^9.0 || ^10.0"
+        "phpunit/phpunit": "^10.0"
     },
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "OpenSoutheners\\PhpPackage\\": "src"
+            "OpenSoutheners\\Docker\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "OpenSoutheners\\PhpPackage\\Tests\\": "tests"
+            "OpenSoutheners\\Docker\\Tests\\": "tests"
         }
     },
     "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "OpenSoutheners\\PhpPackage\\ServiceProvider"
-            ]
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }
