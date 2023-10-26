@@ -2,14 +2,15 @@
 
 namespace OpenSoutheners\Docker;
 
-use Http\Client\Common\Plugin\AddHostPlugin;
 use Http\Client\Common\Plugin\ContentLengthPlugin;
 use Http\Client\Common\Plugin\DecoderPlugin;
 use Http\Client\Common\PluginClientFactory;
 use Http\Client\HttpClient;
 use Http\Client\Socket\Client as SocketClient;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Http\Discovery\Psr18ClientDiscovery;
+use OpenSoutheners\Docker\Exceptions\DockerApiException;
+use OpenSoutheners\Docker\Exceptions\UnacceptedResponseFormatting;
+use OpenSoutheners\Docker\Serialize\DockerStream;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -20,11 +21,17 @@ use function OpenSoutheners\LaravelHelpers\Utils\build_http_query;
 
 class ApiClient
 {
+    public const RAW_CONTENT_TYPE = 'text/raw';
+
     public const JSON_CONTENT_TYPE = 'application/json';
 
     public const STREAM_CONTENT_TYPE = 'application/octet-stream';
 
-    private HttpClient $client; 
+    public const MULTIPLEXED_DOCKER_STREAM_CONTENT_TYPE = 'application/vnd.docker.multiplexed-stream';
+
+    public const RAW_DOCKER_STREAM_CONTENT_TYPE = 'application/vnd.docker.raw-stream';
+
+    private HttpClient $client;
 
     public function __construct(
         private string $baseUrl,
@@ -42,7 +49,7 @@ class ApiClient
         ]);
 
         $this->pluginFactory ??= new PluginClientFactory;
-        
+
         $this->client = $this->pluginFactory->createClient($socket, [
             new ContentLengthPlugin(),
             new DecoderPlugin(),
@@ -76,7 +83,41 @@ class ApiClient
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseUrl.$path.build_http_query($params)
-        )->withBody($this->getParsedBody($body));
+        )->withBody($this->applySentBodyParsing($body));
+
+        return $this->executeRequest($request);
+    }
+
+    public function put(string $path, $body = null, array $params = [], string $contentType = null)
+    {
+        $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
+
+        $request = $this->requestFactory->createRequest(
+            'PUT',
+            $this->baseUrl.$path.build_http_query($params)
+        )->withBody($this->applySentBodyParsing($body));
+
+        return $this->executeRequest($request);
+    }
+
+    public function patch(string $path, $body = null, array $params = [], string $contentType = null)
+    {
+        $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
+
+        $request = $this->requestFactory->createRequest(
+            'PATCH',
+            $this->baseUrl.$path.build_http_query($params)
+        )->withBody($this->applySentBodyParsing($body));
+
+        return $this->executeRequest($request);
+    }
+
+    public function delete(string $path, array $params = [])
+    {
+        $request = $this->requestFactory->createRequest(
+            'DELETE',
+            $this->baseUrl.$path.build_http_query($params)
+        );
 
         return $this->executeRequest($request);
     }
@@ -110,36 +151,51 @@ class ApiClient
     /**
      * Get parsed body using Content-Type header.
      */
-    private function getParsedBody(mixed $body): mixed
+    private function applySentBodyParsing(mixed $body): mixed
     {
         return match ($this->headers['Content-Type'] ?? null) {
             static::JSON_CONTENT_TYPE => json_encode($body),
+            static::RAW_CONTENT_TYPE => $body,
             // TODO:
-            // static::STREAM_CONTENT_TYPE => 
+            // static::STREAM_CONTENT_TYPE =>
             default => $body,
         };
     }
 
-    private function parseResponse(ResponseInterface $response)
+    /**
+     * Get parsed body from response using Accept falling back to default.
+     */
+    private function applyResponseParsing(ResponseInterface $response): mixed
     {
-        
-        if (204 === $response->getStatusCode()) {
+        return match ($this->headers['Accept'] ?? $response->getHeader('Content-Type')[0]) {
+            static::JSON_CONTENT_TYPE => json_decode($response->getBody()->getContents(), true),
+            static::RAW_CONTENT_TYPE => $response->getBody()->getContents(),
+            static::RAW_DOCKER_STREAM_CONTENT_TYPE => new DockerStream($response->getBody()),
+            static::MULTIPLEXED_DOCKER_STREAM_CONTENT_TYPE => new DockerStream($response->getBody()),
+            // TODO:
+            // static::STREAM_CONTENT_TYPE =>
+            // default => $response->getBody()->getContents(),
+        };
+    }
+
+    private function parseResponse(ResponseInterface $response): mixed
+    {
+        if ($response->getStatusCode() === 204) {
             return null;
         }
 
-        if (! in_array('application/json', $response->getHeader('content-type'), true)) {
-            // TODO:
-            throw new \Exception($response->getBody()->getContents());
+        $acceptedContentType = $this->headers['Content-Type'] ?? self::JSON_CONTENT_TYPE;
+
+        if (! in_array($acceptedContentType, $response->getHeader('content-type'), true)) {
+            throw UnacceptedResponseFormatting::fromAccepted($acceptedContentType, $response);
         }
 
-        $deserialisedJsonBody = json_decode($response->getBody()->getContents(), true);
+        $bodyContent = $this->applyResponseParsing($response);
 
-        dump($response->getStatusCode());
         if ($response->getStatusCode() >= 300) {
-            // TODO:
-            throw new \Exception($response->getReasonPhrase());
+            throw DockerApiException::fromResponse($response, $bodyContent);
         }
 
-        return $deserialisedJsonBody;
+        return $bodyContent;
     }
 }

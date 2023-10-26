@@ -23,12 +23,12 @@ class System extends Endpoint
         return $usingHead ? $this->client->head('/_ping') : $this->client->get('/_ping');
     }
 
-    public function events(?SystemEventsQuery $query = null)
+    public function events(SystemEventsQuery $query = null)
     {
         return $this->client->get('/events', $query ? $query->toArray() : []);
     }
 
-    public function dataUsage(?SystemStorageUsageQuery $query = null)
+    public function dataUsage(SystemStorageUsageQuery $query = null)
     {
         return $this->client->get('/system/df', $query ? $query->toArray() : []);
     }

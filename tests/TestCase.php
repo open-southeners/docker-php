@@ -2,8 +2,8 @@
 
 namespace OpenSoutheners\PhpPackage\Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
 use OpenSoutheners\PhpPackage\ServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {

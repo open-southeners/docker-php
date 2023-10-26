@@ -28,12 +28,12 @@ trait HandlesSystem
         return $this->system->ping($usingHead);
     }
 
-    public function getSystemEvents(?SystemEventsQuery $query = null)
+    public function getSystemEvents(SystemEventsQuery $query = null)
     {
         return $this->system->events($query);
     }
 
-    public function getStorageUsage(?SystemStorageUsageQuery $query = null)
+    public function getStorageUsage(SystemStorageUsageQuery $query = null)
     {
         return $this->system->dataUsage($query);
     }

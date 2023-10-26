@@ -8,6 +8,6 @@ abstract class Endpoint
 
     public function __construct(protected ApiClient $client)
     {
-        // 
+        //
     }
 }

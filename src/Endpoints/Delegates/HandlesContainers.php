@@ -13,6 +13,7 @@ use OpenSoutheners\Docker\Queries\Containers\ContainersStartQuery;
 use OpenSoutheners\Docker\Queries\Containers\ContainersStatsQuery;
 use OpenSoutheners\Docker\Queries\Containers\ContainersStopQuery;
 use OpenSoutheners\Docker\Queries\Containers\ContainersTopQuery;
+use OpenSoutheners\Docker\Serialize\DockerStream;
 
 /**
  * @mixin \OpenSoutheners\Docker\Client
@@ -21,7 +22,7 @@ trait HandlesContainers
 {
     protected Containers $containers;
 
-    public function getContainers(?ContainersListQuery $query = null)
+    public function getContainers(ContainersListQuery $query = null)
     {
         return $this->containers->list($query);
     }
@@ -30,18 +31,18 @@ trait HandlesContainers
     {
         return $this->containers->create($body);
     }
-    
-    public function getContainer(string $id, ?ContainersInspectQuery $query = null)
+
+    public function getContainer(string $id, ContainersInspectQuery $query = null)
     {
         return $this->containers->inspect($id, $query);
     }
-    
-    public function getContainerProcesses(string $id, ?ContainersTopQuery $query = null)
+
+    public function getContainerProcesses(string $id, ContainersTopQuery $query = null)
     {
         return $this->containers->top($id, $query);
     }
 
-    public function getContainerLogs(string $id, ?ContainersLogsQuery $query = null)
+    public function getContainerLogs(string $id, ContainersLogsQuery $query): DockerStream
     {
         return $this->containers->logs($id, $query);
     }
@@ -56,27 +57,27 @@ trait HandlesContainers
         return $this->containers->export($id);
     }
 
-    public function getContainerStats(string $id, ?ContainersStatsQuery $query = null)
+    public function getContainerStats(string $id, ContainersStatsQuery $query = null)
     {
         return $this->containers->stats($id, $query);
     }
 
-    public function startContainer(string $id, ?ContainersStartQuery $query = null)
+    public function startContainer(string $id, ContainersStartQuery $query = null)
     {
         return $this->containers->start($id, $query);
     }
 
-    public function stopContainer(string $id, ?ContainersStopQuery $query = null)
+    public function stopContainer(string $id, ContainersStopQuery $query = null)
     {
         return $this->containers->stop($id, $query);
     }
 
-    public function restartContainer(string $id, ?ContainersRestartQuery $query = null)
+    public function restartContainer(string $id, ContainersRestartQuery $query = null)
     {
         return $this->containers->restart($id, $query);
     }
 
-    public function killContainer(string $id, ?ContainersKillQuery $query = null)
+    public function killContainer(string $id, ContainersKillQuery $query = null)
     {
         return $this->containers->kill($id, $query);
     }
@@ -99,5 +100,35 @@ trait HandlesContainers
     public function unpauseContainer(string $id)
     {
         return $this->containers->unpause($id);
+    }
+
+    public function waitForContainer(string $id)
+    {
+        return $this->containers->wait($id);
+    }
+
+    public function removeContainer(string $id): null
+    {
+        return $this->containers->remove($id);
+    }
+
+    public function getContainerFilesystemInfo(string $id)
+    {
+        return $this->containers->filesystem($id);
+    }
+
+    public function backupFilesFromContainer(string $id)
+    {
+        return $this->containers->backupFiles($id);
+    }
+
+    public function uploadFilesToContainer(string $id)
+    {
+        return $this->containers->uploadFiles($id);
+    }
+
+    public function pruneContainers()
+    {
+        return $this->containers->prune();
     }
 }
