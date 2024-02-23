@@ -3,43 +3,44 @@
 namespace OpenSoutheners\Docker\Endpoints;
 
 use OpenSoutheners\Docker\Endpoint;
+use OpenSoutheners\Docker\Queries\Swarm\SwarmLeaveQuery;
 
 class Swarm extends Endpoint
 {
     protected const PATH = '/swarm';
 
-    public function inspect()
+    public function inspect(): mixed
     {
         return $this->client->get(self::PATH);
     }
 
-    public function init()
+    public function init(): mixed
     {
-        return $this->client->post(self::PATH.'/init');
+        return $this->client->post(self::PATH . '/init');
     }
 
-    public function join()
+    public function join(): mixed
     {
-        return $this->client->post(self::PATH.'/join');
+        return $this->client->post(self::PATH . '/join');
     }
 
-    public function leave()
+    public function leave(?SwarmLeaveQuery $query = null): mixed
     {
-        return $this->client->post(self::PATH.'/leave');
+        return $this->client->post(self::PATH . '/leave');
     }
 
-    public function update()
+    public function update(): mixed
     {
-        return $this->client->post(self::PATH.'/update');
+        return $this->client->post(self::PATH . '/update');
     }
 
-    public function keyToUnlock()
+    public function keyToUnlock(): mixed
     {
-        return $this->client->get(self::PATH.'/unlockkey');
+        return $this->client->get(self::PATH . '/unlockkey');
     }
 
-    public function unlock()
+    public function unlock(): mixed
     {
-        return $this->client->post(self::PATH.'/unlock');
+        return $this->client->post(self::PATH . '/unlock');
     }
 }

@@ -11,37 +11,37 @@ trait HandlesSwarm
 {
     protected Swarm $swarm;
 
-    public function getSwarm()
+    public function getSwarm(): mixed
     {
         return $this->swarm->inspect();
     }
 
-    public function initSwarm()
+    public function initSwarm(): mixed
     {
         return $this->swarm->init();
     }
 
-    public function joinSwarm()
+    public function joinSwarm(): mixed
     {
         return $this->swarm->join();
     }
 
-    public function leaveSwarm()
+    public function leaveSwarm(): mixed
     {
         return $this->swarm->leave();
     }
 
-    public function updateSwarm()
+    public function updateSwarm(): mixed
     {
         return $this->swarm->update();
     }
 
-    public function getKeyToUnlockSwarm()
+    public function getKeyToUnlockSwarm(): mixed
     {
         return $this->swarm->keyToUnlock();
     }
 
-    public function unlockSwarm()
+    public function unlockSwarm(): mixed
     {
         return $this->swarm->unlock();
     }

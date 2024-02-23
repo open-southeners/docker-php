@@ -18,7 +18,7 @@ final class Service
         public array|null $ports = [],
         public array|null $labels = [],
     ) {
-        // 
+        //
     }
 
     public function toArray()
@@ -27,7 +27,7 @@ final class Service
             'name' => $this->name,
             'image' => $this->image,
             'build' => $this->build,
-            'ports' => array_map(fn (ServicePort $port) => $port->mode ? $port->toArray() : (string) $port, $this->ports),
+            'ports' => array_map(fn(ServicePort $port) => $port->mode ? $port->toArray() : (string) $port, $this->ports),
             'labels' => $this->labels,
         ]);
     }

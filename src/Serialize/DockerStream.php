@@ -11,9 +11,7 @@ class DockerStream
         protected array $onStdinCallables = [],
         protected array $onStdoutCallables = [],
         protected array $onStderrCallables = []
-    ) {
-        
-    }
+    ) {}
 
     /**
      * Add a callable to read stdin.
@@ -45,24 +43,28 @@ class DockerStream
         return $this;
     }
 
-    public function readFrame()
+    public function readFrame(): void
     {
         $header = $this->stream->read(8);
 
+        if (! $header) {
+            return;
+        }
+
         $decoded = unpack('C1type/C3/N1size', $header);
+
+        if (! $decoded) {
+            return;
+        }
+
         $output = $this->forceRead($decoded['size']);
 
-        if (0 === $decoded['type']) {
-            $callbackList = $this->onStdinCallables;
-        }
-
-        if (1 === $decoded['type']) {
-            $callbackList = $this->onStdoutCallables;
-        }
-
-        if (2 === $decoded['type']) {
-            $callbackList = $this->onStderrCallables;
-        }
+        $callbackList = match ($decoded['type']) {
+            0 => $this->onStdinCallables,
+            1 => $this->onStdoutCallables,
+            2 => $this->onStderrCallables,
+            default => [],
+        };
 
         foreach ($callbackList as $callback) {
             $callback($output);
@@ -71,18 +73,14 @@ class DockerStream
 
     /**
      * Force to have something of the expected size (block).
-     *
-     * @param $length
-     *
-     * @return string
      */
-    private function forceRead($length)
+    private function forceRead(int $length): string
     {
         $read = '';
 
         do {
             $read .= $this->stream->read($length - \strlen($read));
-        } while (\strlen($read) < $length && !$this->stream->eof());
+        } while (\strlen($read) < $length && ! $this->stream->eof());
 
         return $read;
     }
@@ -92,7 +90,7 @@ class DockerStream
      */
     public function wait(): void
     {
-        while (!$this->stream->eof()) {
+        while (! $this->stream->eof()) {
             $this->readFrame();
         }
     }

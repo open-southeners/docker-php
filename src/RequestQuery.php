@@ -14,7 +14,7 @@ abstract class RequestQuery
 
         foreach ($reflectionProperties as $reflectionProperty) {
             $propertyValue = $reflectionProperty->getValue($this);
-            
+
             if ($propertyValue === null) {
                 continue;
             }

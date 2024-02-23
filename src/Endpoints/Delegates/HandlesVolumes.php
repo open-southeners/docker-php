@@ -8,32 +8,32 @@ trait HandlesVolumes
 {
     protected Volumes $volumes;
 
-    public function getVolumes()
+    public function getVolumes(): mixed
     {
         return $this->volumes->list();
     }
 
-    public function createVolume()
+    public function createVolume(): mixed
     {
         return $this->volumes->create();
     }
 
-    public function getVolume(string $name)
+    public function getVolume(string $name): mixed
     {
         return $this->volumes->inspect($name);
     }
 
-    public function updateVolume(string $name)
+    public function updateVolume(string $name): mixed
     {
         return $this->volumes->update($name);
     }
 
-    public function removeVolume(string $name)
+    public function removeVolume(string $name): mixed
     {
         return $this->volumes->remove($name);
     }
 
-    public function pruneUnusedVolumes()
+    public function pruneUnusedVolumes(): mixed
     {
         return $this->volumes->prune();
     }

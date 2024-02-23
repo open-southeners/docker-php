@@ -33,90 +33,106 @@ class ApiClient
 
     private HttpClient $client;
 
+    private RequestFactoryInterface $requestFactory;
+
+    private StreamFactoryInterface $streamFactory;
+
     public function __construct(
         private string $baseUrl,
-        private ?SocketClient $socket = null,
-        private ?RequestFactoryInterface $requestFactory = null,
-        private ?StreamFactoryInterface $streamFactory = null,
-        private ?PluginClientFactory $pluginFactory = null,
+        ?SocketClient $socket = null,
+        ?RequestFactoryInterface $requestFactory = null,
+        ?StreamFactoryInterface $streamFactory = null,
+        ?PluginClientFactory $pluginFactory = null,
         private array $headers = []
     ) {
-        $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
-        $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
+        $requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
+        $streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
+
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
 
         $socket ??= new SocketClient($this->requestFactory, [
             'remote_socket' => 'unix:///var/run/docker.sock',
         ]);
 
-        $this->pluginFactory ??= new PluginClientFactory;
+        $pluginFactory ??= new PluginClientFactory();
 
-        $this->client = $this->pluginFactory->createClient($socket, [
+        $this->client = $pluginFactory->createClient($socket, [
             new ContentLengthPlugin(),
             new DecoderPlugin(),
         ]);
     }
 
-    public function get(string $path, array $params = [])
+    private function queryToString(array|RequestQuery $params = []): string
+    {
+        return build_http_query(
+            $params instanceof RequestQuery
+                ? $params->toArray()
+                : $params
+        );
+    }
+
+    public function get(string $path, array|RequestQuery $params = []): mixed
     {
         $request = $this->requestFactory->createRequest(
             'GET',
-            $this->baseUrl.$path.build_http_query($params)
+            $this->baseUrl . $path . $this->queryToString($params)
         );
 
         return $this->executeRequest($request);
     }
 
-    public function head(string $path)
+    public function head(string $path, array|RequestQuery $params = []): mixed
     {
         $request = $this->requestFactory->createRequest(
             'HEAD',
-            $this->baseUrl.$path
+            $this->baseUrl . $path
         );
 
         return $this->executeRequest($request);
     }
 
-    public function post(string $path, $body = null, array $params = [], string $contentType = null)
+    public function post(string $path, $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
         $request = $this->requestFactory->createRequest(
             'POST',
-            $this->baseUrl.$path.build_http_query($params)
+            $this->baseUrl . $path . $this->queryToString($params)
         )->withBody($this->applySentBodyParsing($body));
 
         return $this->executeRequest($request);
     }
 
-    public function put(string $path, $body = null, array $params = [], string $contentType = null)
+    public function put(string $path, $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
         $request = $this->requestFactory->createRequest(
             'PUT',
-            $this->baseUrl.$path.build_http_query($params)
+            $this->baseUrl . $path . $this->queryToString($params)
         )->withBody($this->applySentBodyParsing($body));
 
         return $this->executeRequest($request);
     }
 
-    public function patch(string $path, $body = null, array $params = [], string $contentType = null)
+    public function patch(string $path, $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
         $request = $this->requestFactory->createRequest(
             'PATCH',
-            $this->baseUrl.$path.build_http_query($params)
+            $this->baseUrl . $path . $this->queryToString($params)
         )->withBody($this->applySentBodyParsing($body));
 
         return $this->executeRequest($request);
     }
 
-    public function delete(string $path, array $params = [])
+    public function delete(string $path, array|RequestQuery $params = []): mixed
     {
         $request = $this->requestFactory->createRequest(
             'DELETE',
-            $this->baseUrl.$path.build_http_query($params)
+            $this->baseUrl . $path . $this->queryToString($params)
         );
 
         return $this->executeRequest($request);
@@ -134,7 +150,7 @@ class ApiClient
         return $this;
     }
 
-    private function executeRequest(RequestInterface $request)
+    private function executeRequest(RequestInterface $request): mixed
     {
         foreach ($this->headers as $header => $value) {
             $request = $request->withAddedHeader($header, $value);

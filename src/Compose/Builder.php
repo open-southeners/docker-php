@@ -31,14 +31,14 @@ class Builder
 
     public function toFile(string $filePath = null): void
     {
-        // 
+        //
     }
 
     public function toArray(): array
     {
         return [
             'version' => $this->version,
-            'services' => array_map(fn (Service $service) => $service->toArray(), $this->services),
+            'services' => array_map(fn(Service $service) => $service->toArray(), $this->services),
         ];
     }
 
@@ -49,7 +49,7 @@ class Builder
 
     public function newServiceBuilder(): ServiceBuilder
     {
-        return new ServiceBuilder;
+        return new ServiceBuilder();
     }
 
     public function addService(string $id, Service $service): self

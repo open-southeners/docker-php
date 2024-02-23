@@ -11,37 +11,37 @@ trait HandlesNetworks
 {
     protected Networks $networks;
 
-    public function getNetworks()
+    public function getNetworks(): mixed
     {
         return $this->networks->list();
     }
 
-    public function getNetwork(string $id)
+    public function getNetwork(string $id): mixed
     {
         return $this->networks->inspect($id);
     }
 
-    public function removeNetwork(string $id)
+    public function removeNetwork(string $id): mixed
     {
         return $this->networks->remove($id);
     }
 
-    public function create(string $id)
+    public function create(string $id): mixed
     {
         return $this->networks->create($id);
     }
 
-    public function attachNetworkToContainer(string $id)
+    public function attachNetworkToContainer(string $id): mixed
     {
         return $this->networks->attachToContainer($id);
     }
 
-    public function removeNetworkFromContainer(string $id)
+    public function removeNetworkFromContainer(string $id): mixed
     {
         return $this->networks->removeFromContainer($id);
     }
 
-    public function pruneUnusedNetworks()
+    public function pruneUnusedNetworks(): mixed
     {
         return $this->networks->prune();
     }

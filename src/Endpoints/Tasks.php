@@ -8,18 +8,18 @@ class Tasks extends Endpoint
 {
     protected const PATH = '/tasks';
 
-    public function list()
+    public function list(): mixed
     {
         return $this->client->get(self::PATH);
     }
 
-    public function inspect(string $id)
+    public function inspect(string $id): mixed
     {
-        return $this->client->get(self::PATH."/{$id}");
+        return $this->client->get(self::PATH . "/{$id}");
     }
 
-    public function logs(string $id)
+    public function logs(string $id): mixed
     {
-        return $this->client->get(self::PATH."/{$id}/logs");
+        return $this->client->get(self::PATH . "/{$id}/logs");
     }
 }

@@ -8,78 +8,78 @@ class Images extends Endpoint
 {
     protected const PATH = '/images';
 
-    public function list()
+    public function list(): mixed
     {
-        return $this->client->get(self::PATH.'/json');
+        return $this->client->get(self::PATH . '/json');
     }
 
-    public function build()
+    public function build(): mixed
     {
         return $this->client->post('/build');
     }
 
-    public function pruneBuildCache()
+    public function pruneBuildCache(): mixed
     {
         return $this->client->post('/build/prune');
     }
 
-    public function create()
+    public function create(): mixed
     {
-        return $this->client->post(self::PATH.'/images/create');
+        return $this->client->post(self::PATH . '/images/create');
     }
 
-    public function inspect(string $name)
+    public function inspect(string $name): mixed
     {
-        return $this->client->post(self::PATH."/{$name}/json");
+        return $this->client->post(self::PATH . "/{$name}/json");
     }
 
-    public function history(string $name)
+    public function history(string $name): mixed
     {
-        return $this->client->get(self::PATH."/{$name}/history");
+        return $this->client->get(self::PATH . "/{$name}/history");
     }
 
-    public function push(string $name)
+    public function push(string $name): mixed
     {
-        return $this->client->post(self::PATH."/{$name}/push");
+        return $this->client->post(self::PATH . "/{$name}/push");
     }
 
-    public function tag(string $name)
+    public function tag(string $name): mixed
     {
-        return $this->client->post(self::PATH."/{$name}/tag");
+        return $this->client->post(self::PATH . "/{$name}/tag");
     }
 
-    public function remove(string $name)
+    public function remove(string $name): mixed
     {
-        return $this->client->delete(self::PATH."/{$name}");
+        return $this->client->delete(self::PATH . "/{$name}");
     }
 
-    public function search()
+    public function search(): mixed
     {
-        return $this->client->get(self::PATH.'/search');
+        return $this->client->get(self::PATH . '/search');
     }
 
-    public function prune()
+    public function prune(): mixed
     {
-        return $this->client->post(self::PATH.'/prune');
+        return $this->client->post(self::PATH . '/prune');
     }
 
-    public function commit()
+    public function commit(): mixed
     {
         return $this->client->post('/commit');
     }
 
-    public function export(string $name)
+    public function export(string $name): mixed
     {
-        return $this->client->get(self::PATH."/{$name}/get");
+        return $this->client->get(self::PATH . "/{$name}/get");
     }
 
-    public function exportMany()
+    public function exportMany(): mixed
     {
-        return $this->client->get(self::PATH.'/get');
+        return $this->client->get(self::PATH . '/get');
     }
 
-    public function import()
+    public function import(): mixed
     {
-        return $this->client->post(self::PATH.'/load');
+        return $this->client->post(self::PATH . '/load');
     }
 }

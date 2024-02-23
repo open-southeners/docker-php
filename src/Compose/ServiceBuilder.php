@@ -7,7 +7,7 @@ class ServiceBuilder
     public function __construct(
         protected ?Service $service = null
     ) {
-        $this->service ??= new Service;
+        $this->service ??= new Service();
     }
 
     public function fromArray(array $data): self

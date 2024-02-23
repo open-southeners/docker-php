@@ -13,7 +13,7 @@ class ServicePort
         public string|null $protocol = null,
         public string|null $mode = null
     ) {
-        // 
+        //
     }
 
     public function getPublished(): int|string

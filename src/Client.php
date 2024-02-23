@@ -54,7 +54,7 @@ class Client
         StreamFactoryInterface $streamFactory = null
     ) {
         $this->apiClient = new ApiClient(
-            $url.'/'.static::DOCKER_API_VERSION,
+            $url . '/' . static::DOCKER_API_VERSION,
             $socketClient,
             $requestFactory,
             $streamFactory

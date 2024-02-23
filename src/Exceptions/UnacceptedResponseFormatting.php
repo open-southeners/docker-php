@@ -9,9 +9,9 @@ class UnacceptedResponseFormatting extends \Exception implements ClientException
 {
     public const EXCEPTION_MESSAGE = 'The Docker API response formatted as "%s" did not match return format "%s".';
 
-    public static function fromAccepted(string $contentType, ResponseInterface $response, \Throwable $previous = null)
+    public static function fromAccepted(string $contentType, ResponseInterface $response, \Throwable $previous = null): self
     {
-        return new static(sprintf(
+        return new self(sprintf(
             self::EXCEPTION_MESSAGE,
             implode(', ', $response->getHeader('Content-Type')),
             $contentType

@@ -13,27 +13,27 @@ trait HandlesSystem
 {
     protected System $system;
 
-    public function getSystemInfo()
+    public function getSystemInfo(): mixed
     {
         return $this->system->info();
     }
 
-    public function getVersion()
+    public function getVersion(): mixed
     {
         return $this->system->version();
     }
 
-    public function ping(bool $usingHead = true)
+    public function ping(bool $usingHead = true): mixed
     {
         return $this->system->ping($usingHead);
     }
 
-    public function getSystemEvents(SystemEventsQuery $query = null)
+    public function getSystemEvents(SystemEventsQuery $query = null): mixed
     {
         return $this->system->events($query);
     }
 
-    public function getStorageUsage(SystemStorageUsageQuery $query = null)
+    public function getStorageUsage(SystemStorageUsageQuery $query = null): mixed
     {
         return $this->system->dataUsage($query);
     }

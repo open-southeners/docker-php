@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class DockerApiException extends \Exception implements ClientExceptionInterface
 {
-    public static function fromResponse(ResponseInterface $response, array|string $responseBody)
+    public static function fromResponse(ResponseInterface $response, array|string $responseBody): self
     {
         $errorMessage = $response->getReasonPhrase();
 
@@ -18,6 +18,6 @@ class DockerApiException extends \Exception implements ClientExceptionInterface
                 : ($responseBody['message'] ?? '');
         }
 
-        return new static($errorMessage, $response->getStatusCode());
+        return new self($errorMessage, $response->getStatusCode());
     }
 }
