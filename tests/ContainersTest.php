@@ -36,7 +36,7 @@ test('list running containers returns array', function () {
 });
 
 test('get container by ID returns array', function () {
-    $container = $this->client->getContainer('ec214ba23641');
+    $container = $this->client->getContainer('docker_php_initial_container');
 
     expect($container)->toBeArray();
     expect($container)->toHaveKeys([

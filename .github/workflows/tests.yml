@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-suggest
 
+      - name: Run initial testing Docker container
+        run: docker run --name docker_php_initial_container -d alpine:3.18
+
       - name: Execute tests
         run: vendor/bin/pest -c phpunit.dist.xml --coverage-clover clover.xml
 
