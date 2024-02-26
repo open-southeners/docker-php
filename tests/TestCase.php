@@ -1,22 +1,10 @@
 <?php
 
-namespace OpenSoutheners\PhpPackage\Tests;
+namespace Tests;
 
-use OpenSoutheners\PhpPackage\ServiceProvider;
-use Orchestra\Testbench\TestCase as Orchestra;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
-abstract class TestCase extends Orchestra
+abstract class TestCase extends BaseTestCase
 {
-    /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return array<int, class-string>
-     */
-    protected function getPackageProviders($app)
-    {
-        return [
-            ServiceProvider::class,
-        ];
-    }
+    //
 }
