@@ -10,20 +10,9 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest ]
-        php: [ 8.0, 8.1, 8.2 ]
-        laravel: [ 9.*, 10.* ]
-        dependency-version: [ prefer-stable ]
-        include:
-          - laravel: 9.*
-            testbench: 7.*
+        php: [ 8.0, 8.1, 8.2, 8.3 ]
 
-          - laravel: 10.*
-            testbench: 8.*
-        exclude:
-          - laravel: 10.*
-            php: 8.0
-
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -45,17 +34,16 @@ jobs:
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ matrix.dependency-version }}-
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+        run: composer install --prefer-dist --no-interaction --no-suggest
 
       - name: Execute tests
-        run: vendor/bin/phpunit -c phpunit.coverage.dist.xml
+        run: vendor/bin/pest --coverage-clover clover.xml
 
       - name: Upload coverage reports to Codecov
+        if: matrix.php == '8.3'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

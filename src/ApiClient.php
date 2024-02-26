@@ -17,6 +17,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
+use Psr\Http\Message\StreamInterface;
+
 use function OpenSoutheners\LaravelHelpers\Utils\build_http_query;
 
 class ApiClient
@@ -39,10 +41,10 @@ class ApiClient
 
     public function __construct(
         private string $baseUrl,
-        ?SocketClient $socket = null,
-        ?RequestFactoryInterface $requestFactory = null,
-        ?StreamFactoryInterface $streamFactory = null,
-        ?PluginClientFactory $pluginFactory = null,
+        SocketClient $socket = null,
+        RequestFactoryInterface $requestFactory = null,
+        StreamFactoryInterface $streamFactory = null,
+        PluginClientFactory $pluginFactory = null,
         private array $headers = []
     ) {
         $requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
@@ -51,7 +53,7 @@ class ApiClient
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
 
-        $socket ??= new SocketClient($this->requestFactory, [
+        $socket ??= new SocketClient([
             'remote_socket' => 'unix:///var/run/docker.sock',
         ]);
 
@@ -143,6 +145,11 @@ class ApiClient
         return $this->usingHeader('Content-Type', $value);
     }
 
+    public function acceptResponseType(string $value): static
+    {
+        return $this->usingHeader('Accept', $value);
+    }
+
     public function usingHeader(string $header, string $value): static
     {
         $this->headers[$header] = $value;
@@ -167,15 +174,17 @@ class ApiClient
     /**
      * Get parsed body using Content-Type header.
      */
-    private function applySentBodyParsing(mixed $body): mixed
+    private function applySentBodyParsing(mixed $body): StreamInterface
     {
-        return match ($this->headers['Content-Type'] ?? null) {
+        $parsedBody = match ($this->headers['Content-Type'] ?? null) {
             static::JSON_CONTENT_TYPE => json_encode($body),
             static::RAW_CONTENT_TYPE => $body,
             // TODO:
             // static::STREAM_CONTENT_TYPE =>
             default => $body,
         };
+
+        return $this->streamFactory->createStream($parsedBody);
     }
 
     /**
@@ -196,7 +205,7 @@ class ApiClient
 
     private function parseResponse(ResponseInterface $response): mixed
     {
-        if ($response->getStatusCode() === 204) {
+        if (in_array($response->getStatusCode(), [204, 304], true)) {
             return null;
         }
 

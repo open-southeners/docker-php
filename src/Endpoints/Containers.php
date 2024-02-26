@@ -25,9 +25,9 @@ class Containers extends Endpoint
         return $this->client->get(self::PATH . '/json', $query ?? []);
     }
 
-    public function create(array $body): mixed
+    public function create(array $body, ?string $name = null, string $arch = ''): mixed
     {
-        return $this->client->post(self::PATH . '/create', $body);
+        return $this->client->post(self::PATH . '/create', $body, compact('name', 'arch'));
     }
 
     public function inspect(string $id, ?ContainersInspectQuery $query): mixed
@@ -111,7 +111,8 @@ class Containers extends Endpoint
 
     public function remove(string $id): mixed
     {
-        return $this->client->delete(self::PATH . "/{$id}");
+        return $this->client->contentType(ApiClient::RAW_CONTENT_TYPE)
+            ->delete(self::PATH . "/{$id}");
     }
 
     public function filesystem(string $id): mixed

@@ -27,9 +27,9 @@ trait HandlesContainers
         return $this->containers->list($query);
     }
 
-    public function createContainer(array $body): mixed
+    public function createContainer(array $body, ?string $name = null, string $arch = ''): mixed
     {
-        return $this->containers->create($body);
+        return $this->containers->create($body, $name, $arch);
     }
 
     public function getContainer(string $id, ?ContainersInspectQuery $query = null): mixed

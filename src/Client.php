@@ -73,7 +73,7 @@ class Client
         $this->system = new System($this->apiClient);
     }
 
-    public function compose(string $file = null)
+    public function compose(string $file = null): Builder
     {
         return new Builder($file);
     }
