@@ -40,7 +40,9 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-suggest
 
       - name: Run initial testing Docker container
-        run: docker run --name docker_php_initial_container -d alpine:3.18
+        run: |
+          docker run --name docker_php_initial_container -d alpine:3.18
+          docker run --name docker_php_initial_container_2 -d node:20-alpine
 
       - name: Execute tests
         run: vendor/bin/pest -c phpunit.dist.xml --coverage-clover clover.xml

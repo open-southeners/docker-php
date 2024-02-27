@@ -63,22 +63,22 @@ class Containers extends Endpoint
 
     public function start(string $id, ?ContainersStartQuery $query = null): mixed
     {
-        return $this->client->post(self::PATH . "/{$id}/start", $query ?? []);
+        return $this->client->post(self::PATH . "/{$id}/start", null, $query ?? []);
     }
 
     public function stop(string $id, ?ContainersStopQuery $query = null): mixed
     {
-        return $this->client->post(self::PATH . "/{$id}/stop", $query ?? []);
+        return $this->client->post(self::PATH . "/{$id}/stop", null, $query ?? []);
     }
 
     public function restart(string $id, ?ContainersRestartQuery $query = null): mixed
     {
-        return $this->client->post(self::PATH . "/{$id}/restart", $query ?? []);
+        return $this->client->post(self::PATH . "/{$id}/restart", null, $query ?? []);
     }
 
     public function kill(string $id, ?ContainersKillQuery $query = null): mixed
     {
-        return $this->client->post(self::PATH . "/{$id}/kill", $query ?? []);
+        return $this->client->post(self::PATH . "/{$id}/kill", null, $query ?? []);
     }
 
     public function update(string $id, array $body): mixed

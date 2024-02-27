@@ -94,7 +94,7 @@ class ApiClient
         return $this->executeRequest($request);
     }
 
-    public function post(string $path, $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
+    public function post(string $path, string|array $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
@@ -106,7 +106,7 @@ class ApiClient
         return $this->executeRequest($request);
     }
 
-    public function put(string $path, $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
+    public function put(string $path, string|array $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
@@ -118,14 +118,18 @@ class ApiClient
         return $this->executeRequest($request);
     }
 
-    public function patch(string $path, $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
+    public function patch(string $path, string|array $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
         $request = $this->requestFactory->createRequest(
             'PATCH',
             $this->baseUrl . $path . $this->queryToString($params)
-        )->withBody($this->applySentBodyParsing($body));
+        );
+
+        if ($body) {
+            $request->withBody($this->applySentBodyParsing($body));
+        }
 
         return $this->executeRequest($request);
     }
@@ -174,11 +178,10 @@ class ApiClient
     /**
      * Get parsed body using Content-Type header.
      */
-    private function applySentBodyParsing(mixed $body): StreamInterface
+    private function applySentBodyParsing(string|array $body): StreamInterface
     {
         $parsedBody = match ($this->headers['Content-Type'] ?? null) {
             static::JSON_CONTENT_TYPE => json_encode($body),
-            static::RAW_CONTENT_TYPE => $body,
             // TODO:
             // static::STREAM_CONTENT_TYPE =>
             default => $body,
