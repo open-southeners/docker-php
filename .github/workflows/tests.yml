@@ -39,13 +39,12 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-suggest
 
-      - name: Run initial testing Docker container
+      - name: Execute tests
         run: |
           docker run --name docker_php_initial_container -d alpine:3.18
           docker run --name docker_php_initial_container_2 -d node:20-alpine
-
-      - name: Execute tests
-        run: vendor/bin/pest -c phpunit.dist.xml --coverage-clover clover.xml
+          docker ps -a
+          vendor/bin/pest -c phpunit.dist.xml --coverage-clover clover.xml
 
       - name: Upload coverage reports to Codecov
         if: matrix.php == '8.3'
