@@ -94,31 +94,39 @@ class ApiClient
         return $this->executeRequest($request);
     }
 
-    public function post(string $path, string|array $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
+    public function post(string $path, string|array|null $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseUrl . $path . $this->queryToString($params)
-        )->withBody($this->applySentBodyParsing($body));
+        );
+
+        if ($body) {
+            $request->withBody($this->applySentBodyParsing($body));
+        }
 
         return $this->executeRequest($request);
     }
 
-    public function put(string $path, string|array $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
+    public function put(string $path, string|array|null $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
         $request = $this->requestFactory->createRequest(
             'PUT',
             $this->baseUrl . $path . $this->queryToString($params)
-        )->withBody($this->applySentBodyParsing($body));
+        );
+
+        if ($body) {
+            $request->withBody($this->applySentBodyParsing($body));
+        }
 
         return $this->executeRequest($request);
     }
 
-    public function patch(string $path, string|array $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
+    public function patch(string $path, string|array|null $body = null, array|RequestQuery $params = [], ?string $contentType = null): mixed
     {
         $this->contentType($contentType ?? static::JSON_CONTENT_TYPE);
 
@@ -134,12 +142,16 @@ class ApiClient
         return $this->executeRequest($request);
     }
 
-    public function delete(string $path, array|RequestQuery $params = []): mixed
+    public function delete(string $path, string|array|null $body = null, array|RequestQuery $params = []): mixed
     {
         $request = $this->requestFactory->createRequest(
             'DELETE',
             $this->baseUrl . $path . $this->queryToString($params)
         );
+
+        if ($body) {
+            $request->withBody($this->applySentBodyParsing($body));
+        }
 
         return $this->executeRequest($request);
     }
@@ -184,8 +196,12 @@ class ApiClient
             static::JSON_CONTENT_TYPE => json_encode($body),
             // TODO:
             // static::STREAM_CONTENT_TYPE =>
-            default => $body,
+            default => is_array($body) ? json_encode($body) : $body,
         };
+
+        if (! $parsedBody) {
+            throw new \Exception('Body serialization format error, sent falsy or empty value.');
+        }
 
         return $this->streamFactory->createStream($parsedBody);
     }
@@ -220,7 +236,7 @@ class ApiClient
 
         $bodyContent = $this->applyResponseParsing($response);
 
-        if ($response->getStatusCode() >= 300) {
+        if ((is_string($bodyContent) || is_array($bodyContent)) && $response->getStatusCode() >= 300) {
             throw DockerApiException::fromResponse($response, $bodyContent);
         }
 
